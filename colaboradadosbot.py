@@ -1,7 +1,6 @@
 # Importando as libraries
 
-import numpy as np
-import pandas as pd
+import rows
 import tweepy
 import settings
 
@@ -14,7 +13,9 @@ STATUS_SUCESSO = 200
 # Fingindo ser um humano
 
 headers = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) ' + \
+    'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
+}
 
 # Autenticando o Twitter
 
@@ -43,15 +44,7 @@ def carregar_dados_site():
     Abrindo a lista de portais da transparência e tratando
     informações que serão tratados como NaN para o pandas.
     """
-    df = pd.read_csv(
-        'lista_portais.csv',
-        header=None,
-        names=['url', 'arroba', 'orgao'],
-        sep=';'
-    )
-    df = df.replace(np.nan, '', regex=True)
-
-    return df
+    return rows.import_from_csv("lista_portais.csv")
 
 
 def busca_disponibilidade_sites(sites):
@@ -63,12 +56,13 @@ def busca_disponibilidade_sites(sites):
     Caso contrário, envie um novo tweet avisando da indisponibilidade
     citando o perfil do órgão no Twitter caso tenha.
     """
-    for index, row in sites.iterrows():
-        url, arroba, orgao = row['url'], row['arroba'], row['orgao']
+    for row in sites:
+        url, arroba, orgao = row.url, row.arroba, row.orgao
 
         for tentativa in range(TOTAL_TENTATIVAS):
             try:
-                resposta = get(row['url'], timeout=30, headers=headers)
+                print("Checando {}".format(url))
+                resposta = get(url, timeout=30, headers=headers)
                 if resposta.status_code == STATUS_SUCESSO:
                     continue
 
