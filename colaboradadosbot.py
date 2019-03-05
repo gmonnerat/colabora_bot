@@ -64,7 +64,7 @@ def busca_disponibilidade_sites(sites):
                 print("Checando {}".format(url))
                 resposta = get(url, timeout=30, headers=headers)
                 if resposta.status_code == STATUS_SUCESSO:
-                    continue
+                    break
 
                 criar_tweet(arroba, orgao, url)
             except exceptions.ConnectionError:
